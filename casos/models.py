@@ -87,17 +87,18 @@ class Pago(models.Model):
 
     def __str__(self):
         return f'S/ {self.monto} - {self.caso.codigo} ({self.fecha})'
-
     def clean(self):
-        # Regla de negocio: solo se paga si el estado del caso lo permite
-        if self.caso_id and not self.caso.estado.permite_pagos:
+        # Regla de negocio: no se puede REGISTRAR un pago nuevo si el estado
+        # del caso no lo permite (los pagos ya existentes se respetan).
+        caso = getattr(self, 'caso', None)
+        if self.pk is None and caso and not caso.estado.permite_pagos:
             raise ValidationError(
                 f'No se pueden registrar pagos: el caso está en estado '
-                f'"{self.caso.estado}".'
+                f'"{caso.estado}".'
             )
         if self.monto is not None and self.monto <= 0:
             raise ValidationError({'monto': 'El monto debe ser mayor que cero.'})
-
+        
 
 class PerfilAbogado(models.Model):
     # Uno a uno: cada usuario abogado tiene un solo perfil
