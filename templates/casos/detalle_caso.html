@@ -1,0 +1,38 @@
+{% extends 'casos/base.html' %}
+
+{% block contenido %}
+<h2>Detalle del Caso: {{ caso.codigo }}</h2>
+<p><strong>Título:</strong> {{ caso.titulo }}</p>
+<p><strong>Cliente:</strong> {{ caso.cliente.nombres }}</p>
+<p><strong>Estado:</strong> {{ caso.estado.nombre }}</p>
+<p><strong>Descripción:</strong> {{ caso.descripcion|default:"Sin descripción" }}</p>
+
+<!-- Validación con if -->
+{% if not caso.estado.permite_pagos %}
+    <p style="color: red; font-weight: bold;">Este caso no admite pagos</p>
+{% endif %}
+
+<hr>
+
+<h3>Expedientes</h3>
+<ul>
+    {% for exp in caso.expedientes.all %}
+        <li><strong>{{ exp.numero }}</strong> - {{ exp.juzgado }} (Presentado: {{ exp.fecha_presentacion }})</li>
+    {% empty %}
+        <li>No hay expedientes para este caso.</li>
+    {% endfor %}
+</ul>
+
+<h3>Pagos</h3>
+<ul>
+    {% for pago in caso.pagos.all %}
+        <!-- Formato de fecha d/m/Y -->
+        <li>S/ {{ pago.monto }} - Fecha: {{ pago.fecha|date:"d/m/Y" }} - {{ pago.descripcion }}</li>
+    {% empty %}
+        <li>No hay pagos registrados.</li>
+    {% endfor %}
+</ul>
+
+<br>
+<a href="{% url 'lista_casos' %}">Volver a la lista de casos</a>
+{% endblock %}

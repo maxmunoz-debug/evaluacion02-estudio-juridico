@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Estudio Jurídico - Vargas & Asociados</title>
+</head>
+<body>
+
+    <!-- MENÚ COMÚN -->
+    <nav style="background-color: #333; padding: 10px;">
+        <a href="{% url 'lista_clientes' %}" style="color: white; margin-right: 15px;">Clientes</a>
+        <a href="{% url 'lista_casos' %}" style="color: white;">Casos</a>
+    </nav>
+
+    <!-- AQUÍ IRÁ EL CONTENIDO DE LAS OTRAS PÁGINAS -->
+    <div style="padding: 20px;">
+        {% block contenido %}
+        {% endblock %}
+    </div>
+
+    <!-- PIE DE PÁGINA COMÚN -->
+    <footer style="background-color: #eee; padding: 10px; text-align: center; margin-top: 30px;">
+        <p>Vargas & Asociados - Gestión de Casos &copy; 2026</p>
+    </footer>
+
+</body>
+</html>
