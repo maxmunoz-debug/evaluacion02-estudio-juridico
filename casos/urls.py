@@ -11,4 +11,5 @@ urlpatterns = [
     # Rutas de casos
     path('casos/', views.lista_casos, name='lista_casos'),
     path('casos/<int:caso_id>/', views.detalle_caso, name='detalle_caso'),
+    path('casos/api/<int:caso_id>/', views.api_caso, name='api_caso'),
 ]

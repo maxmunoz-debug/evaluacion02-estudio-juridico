@@ -3,6 +3,19 @@
 {% block contenido %}
 <h2>Lista de Casos</h2>
 
+<!-- Filtro por estado -->
+<form method="GET" style="margin-bottom: 20px;">
+    <label for="estado">Filtrar por Estado:</label>
+    <select name="estado" id="estado" onchange="this.form.submit()">
+        <option value="">Todos</option>
+        {% for est in estados %}
+            <option value="{{ est.id }}" {% if est.id|stringformat:"s" == estado_actual|stringformat:"s" %}selected{% endif %}>
+                {{ est.nombre }}
+            </option>
+        {% endfor %}
+    </select>
+</form>
+
 <table border="1" cellpadding="5">
     <tr>
         <th>Código</th>
@@ -18,12 +31,10 @@
         <td>{{ caso.cliente.nombres }}</td>
         <td>{{ caso.estado.nombre }}</td>
         <td>
-            <!-- Mostrar relación muchos a muchos -->
             {% for abogado in caso.abogados.all %}
                 {{ abogado.get_full_name|default:abogado.username }}<br>
             {% endfor %}
         </td>
-        <!-- Usar filtro floatformat:2 -->
         <td>S/ {{ caso.total_pagado|floatformat:2 }}</td>
         <td><a href="{% url 'detalle_caso' caso.id %}">Detalle</a></td>
     </tr>

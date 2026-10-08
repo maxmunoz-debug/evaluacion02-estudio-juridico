@@ -5,9 +5,15 @@
 <p><strong>Título:</strong> {{ caso.titulo }}</p>
 <p><strong>Cliente:</strong> {{ caso.cliente.nombres }}</p>
 <p><strong>Estado:</strong> {{ caso.estado.nombre }}</p>
-<p><strong>Descripción:</strong> {{ caso.descripcion|default:"Sin descripción" }}</p>
 
-<!-- Validación con if -->
+<!-- Mensajes de éxito o error -->
+{% if mensaje_exito %}
+    <p style="color: green; font-weight: bold;">{{ mensaje_exito }}</p>
+{% endif %}
+{% if mensaje_error %}
+    <p style="color: red; font-weight: bold;">{{ mensaje_error }}</p>
+{% endif %}
+
 {% if not caso.estado.permite_pagos %}
     <p style="color: red; font-weight: bold;">Este caso no admite pagos</p>
 {% endif %}
@@ -17,22 +23,49 @@
 <h3>Expedientes</h3>
 <ul>
     {% for exp in caso.expedientes.all %}
-        <li><strong>{{ exp.numero }}</strong> - {{ exp.juzgado }} (Presentado: {{ exp.fecha_presentacion }})</li>
+        <li>
+            <strong>{{ exp.numero }}</strong> - {{ exp.juzgado }} 
+            {% if exp.documento %}
+                (<a href="{{ exp.documento.url }}" target="_blank">Ver Documento</a>)
+            {% else %}
+                <!-- Formulario para subir archivo -->
+                <form method="POST" enctype="multipart/form-data" style="display:inline-block;">
+                    {% csrf_token %}
+                    <input type="hidden" name="expediente_id" value="{{ exp.id }}">
+                    <input type="file" name="documento" required>
+                    <button type="submit" name="subir_doc">Subir PDF/Word</button>
+                </form>
+            {% endif %}
+        </li>
     {% empty %}
         <li>No hay expedientes para este caso.</li>
     {% endfor %}
 </ul>
 
+<hr>
+
 <h3>Pagos</h3>
 <ul>
     {% for pago in caso.pagos.all %}
-        <!-- Formato de fecha d/m/Y -->
-        <li>S/ {{ pago.monto }} - Fecha: {{ pago.fecha|date:"d/m/Y" }} - {{ pago.descripcion }}</li>
+        <li>S/ {{ pago.monto }} - {{ pago.fecha|date:"d/m/Y" }} - {{ pago.descripcion }}</li>
     {% empty %}
         <li>No hay pagos registrados.</li>
     {% endfor %}
 </ul>
 
+<!-- Formulario para Nuevo Pago -->
+{% if caso.estado.permite_pagos %}
+    <form method="POST" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; width: 300px;">
+        {% csrf_token %}
+        <h4>Registrar Nuevo Pago</h4>
+        <p>Monto: <input type="number" step="0.01" name="monto" required></p>
+        <p>Descripción: <input type="text" name="descripcion"></p>
+        <button type="submit" name="registrar_pago">Guardar Pago</button>
+    </form>
+{% endif %}
+
 <br>
-<a href="{% url 'lista_casos' %}">Volver a la lista de casos</a>
+<a href="{% url 'api_caso' caso.id %}" target="_blank">Ver JSON de este caso</a> | 
+<a href="{% url 'lista_casos' %}">Volver a la lista</a>
+
 {% endblock %}
